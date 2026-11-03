@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-03T15:36:39.838Z",
-  "ref": "main",
+  "generatedAt": "2026-11-03T22:52:56.045Z",
+  "ref": "cd7b67fd90c7316c33c57f3a84cad66af45a7580",
   "plugins": [
     {
       "id": "example.stats",
@@ -15,7 +15,7 @@
       ],
       "apiVersion": 2,
       "minAppVersion": "0.31.0",
-      "ref": "main",
+      "ref": "cd7b67fd90c7316c33c57f3a84cad66af45a7580",
       "manifest": "plugins/example.stats/manifest.json",
       "main": "plugins/example.stats/main.js",
       "readme": "plugins/example.stats/README.md",
