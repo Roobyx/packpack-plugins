@@ -1,0 +1,9 @@
+{
+  "name": "packpack-plugins",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "index": "node scripts/plugins-index.mjs",
+    "check": "node scripts/plugins-index-check.mjs"
+  }
+}

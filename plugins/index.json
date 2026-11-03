@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "generatedAt": "2026-11-03T15:36:39.838Z",
+  "ref": "main",
+  "plugins": [
+    {
+      "id": "example.stats",
+      "name": "Map Stats",
+      "pluginVersion": "1.0.0",
+      "description": "Live map statistics in a sidebar panel and a toolbar command.",
+      "author": "PackPack",
+      "tags": [
+        "map",
+        "stats"
+      ],
+      "apiVersion": 2,
+      "minAppVersion": "0.31.0",
+      "ref": "main",
+      "manifest": "plugins/example.stats/manifest.json",
+      "main": "plugins/example.stats/main.js",
+      "readme": "plugins/example.stats/README.md",
+      "icon": "plugins/example.stats/icon.svg",
+      "sha256": {
+        "manifest": "6db5fd37a04d6e0de3988a00fa31793ab2d6621a7a5935b817b7fc4bead62d53",
+        "main": "a4ee2c06b015ba1093b968cec6b0818b697cce90b89f8b7b998a4a4060f703ff",
+        "readme": "606a7c93577b32c9893b0a112a002cec6f7d6ddd72c1c2cfcb95f6de8541898a",
+        "icon": "a1f2fa7422ac73cd232928fa524c24141c4a5e8623319bfbee088d1c8d681f7f"
+      }
+    }
+  ]
+}

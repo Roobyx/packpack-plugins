@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "uiVersion": 1,
+  "apiVersion": 2,
+  "id": "example.stats",
+  "name": "Map Stats",
+  "pluginVersion": "1.0.0",
+  "minAppVersion": "0.31.0",
+  "description": "Live map statistics in a sidebar panel and a toolbar command.",
+  "author": "PackPack",
+  "license": "MIT",
+  "tags": ["map", "stats"],
+  "main": "main.js",
+  "icon": "icon.svg",
+  "readme": "README.md",
+  "capabilities": ["map.read", "ui.sidebar", "ui.toolbar"],
+  "contributes": {
+    "panels": [
+      {
+        "id": "stats",
+        "title": "Map Stats",
+        "location": "right",
+        "order": 100,
+        "body": [
+          {
+            "type": "row",
+            "children": [
+              { "type": "text", "text": "Cells" },
+              { "type": "badge", "id": "cellCount", "text": "0" }
+            ]
+          },
+          { "type": "button", "id": "refresh", "label": "Refresh", "tone": "primary" }
+        ]
+      }
+    ],
+    "commands": [{ "id": "refreshStats", "title": "Refresh map stats" }],
+    "toolbar": [{ "command": "refreshStats", "title": "Refresh stats", "order": 100 }]
+  }
+}
