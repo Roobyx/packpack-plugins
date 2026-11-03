@@ -26,14 +26,18 @@ The folder name must equal the manifest `id`.
    capabilities you need: `map.read`, `map.write`, `ui.sidebar`, `ui.toolbar`.
 2. Add `main.js` (runs in a sandboxed iframe with no DOM, storage or network),
    `README.md` and an `icon.svg`.
-3. Generate the index against an immutable commit:
+3. Commit the plugin files.
+4. Generate the index against that commit:
 
    ```bash
    npm run index -- --ref <commit-sha>
    npm run check
    ```
 
-4. Commit the plugin files and the regenerated `plugins/index.json`.
+5. Commit the regenerated `plugins/index.json`.
+
+The index points at the commit that contains the plugin files, so the two
+commits are expected: the plugin first, then the index that pins it.
 
 The index records the SHA-256 of `manifest.json`, `main.js`, `README.md` and
 `icon.svg`. The app verifies every file before storing a plugin, so a stale or
