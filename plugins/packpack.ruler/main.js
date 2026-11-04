@@ -86,6 +86,12 @@ api.tools
     },
     onPointer(event) {
       zoom = event.viewport.zoom || zoom;
+      if (event.phase === 'cancel') {
+        // The host took the pointer for a pan or the window lost focus; keep
+        // the last measurement but stop extending it.
+        dragging = false;
+        return;
+      }
       if (event.phase === 'down') {
         start = { world: { ...event.world }, cell: { ...event.cell } };
         end = { world: { ...event.world }, cell: { ...event.cell } };
