@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "uiVersion": 1,
+  "apiVersion": 3,
+  "id": "packpack.ruler",
+  "name": "Ruler",
+  "pluginVersion": "1.0.0",
+  "minAppVersion": "0.33.0",
+  "description": "Drag to measure cell distance and world-pixel length on the map.",
+  "author": "PackPack",
+  "license": "MIT",
+  "tags": ["tools", "measure"],
+  "main": "main.js",
+  "icon": "icon.svg",
+  "readme": "README.md",
+  "capabilities": ["tool.canvas"],
+  "contributes": {
+    "tools": [
+      {
+        "id": "ruler",
+        "title": "Ruler",
+        "cursor": "crosshair",
+        "order": 320,
+        "shortcut": "m"
+      }
+    ]
+  }
+}

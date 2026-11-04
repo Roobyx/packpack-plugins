@@ -23,7 +23,9 @@ The folder name must equal the manifest `id`.
 ## Add or update a plugin
 
 1. Create `plugins/<id>/manifest.json` using manifest v2. Declare only the
-   capabilities you need: `map.read`, `map.write`, `ui.sidebar`, `ui.toolbar`.
+   capabilities you need: `map.read`, `map.write`, `ui.sidebar`, `ui.toolbar`,
+   `tool.canvas`. A canvas tool uses `apiVersion` 3 and a `contributes.tools`
+   entry.
 2. Add `main.js` (runs in a sandboxed iframe with no DOM, storage or network),
    `README.md` and an `icon.svg`.
 3. Commit the plugin files.
@@ -56,7 +58,9 @@ the index still points at `main`.
 ## Rules
 
 - One panel per plugin per side; `panels` needs `ui.sidebar`, `toolbar` needs
-  `ui.toolbar`.
+  `ui.toolbar`, and `tools` needs `tool.canvas` plus `apiVersion` 3.
+- A tool shortcut is one lowercase letter or digit and may not use `p`, `e`,
+  `s`, `o` or `i`; two plugins may not claim the same shortcut.
 - Icons are a constrained SVG subset with numeric attributes; scripts, styles
   and event handlers are refused.
 - Source cap 1 MiB, README 256 KiB, icon 64 KiB.

@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "uiVersion": 1,
+  "apiVersion": 3,
+  "id": "packpack.tile-replace",
+  "name": "Tile Replace",
+  "pluginVersion": "1.0.0",
+  "minAppVersion": "0.33.0",
+  "description": "Replace every copy of one tile on the active layer with the armed tile.",
+  "author": "PackPack",
+  "license": "MIT",
+  "tags": ["tools", "tiles", "replace"],
+  "main": "main.js",
+  "icon": "icon.svg",
+  "readme": "README.md",
+  "capabilities": ["map.read", "map.write", "tool.canvas"],
+  "contributes": {
+    "tools": [
+      {
+        "id": "tileReplace",
+        "title": "Tile replace",
+        "cursor": "copy",
+        "order": 310,
+        "shortcut": "t"
+      }
+    ]
+  }
+}

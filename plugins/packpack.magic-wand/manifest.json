@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "uiVersion": 1,
+  "apiVersion": 3,
+  "id": "packpack.magic-wand",
+  "name": "Magic Wand",
+  "pluginVersion": "1.0.0",
+  "minAppVersion": "0.33.0",
+  "description": "Select a contiguous tile region and fill or erase it as one undo entry.",
+  "author": "PackPack",
+  "license": "MIT",
+  "tags": ["tools", "selection", "fill"],
+  "main": "main.js",
+  "icon": "icon.svg",
+  "readme": "README.md",
+  "capabilities": ["map.read", "map.write", "tool.canvas"],
+  "contributes": {
+    "tools": [
+      {
+        "id": "magicWand",
+        "title": "Magic wand",
+        "cursor": "crosshair",
+        "order": 300,
+        "shortcut": "w"
+      }
+    ]
+  }
+}

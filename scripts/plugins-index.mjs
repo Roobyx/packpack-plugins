@@ -17,12 +17,36 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const pluginsDir = join(root, 'plugins');
 const indexPath = join(pluginsDir, 'index.json');
 
-const CAPABILITIES = new Set(['map.read', 'map.write', 'ui.sidebar', 'ui.toolbar']);
+const CAPABILITIES = new Set([
+  'map.read',
+  'map.write',
+  'ui.sidebar',
+  'ui.toolbar',
+  'tool.canvas',
+]);
 const ID = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const LOCAL_ID = /^[A-Za-z0-9_-]{1,64}$/;
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 const PATH = /^(?!\/)(?!.*\.\.)[A-Za-z0-9._/-]+$/;
 const TAG = /^[a-z0-9][a-z0-9-]*$/;
+const TOOL_CURSORS = new Set([
+  'default',
+  'crosshair',
+  'cell',
+  'copy',
+  'move',
+  'grab',
+  'grabbing',
+  'text',
+  'zoom-in',
+  'zoom-out',
+  'not-allowed',
+]);
+const RESERVED_TOOL_SHORTCUTS = new Set(['p', 'e', 's', 'o', 'i']);
+
+function isToolShortcut(value) {
+  return typeof value === 'string' && /^[a-z0-9]$/.test(value);
+}
 
 function fail(message) {
   throw new Error(message);
@@ -146,6 +170,51 @@ function validateContributions(raw, capabilities, file) {
   if (toolbar.length > 0 && !capabilities.includes('ui.toolbar')) {
     fail(`${file}: contributes.toolbar requires the "ui.toolbar" capability`);
   }
+
+  const tools = contributes.tools ?? [];
+  if (!Array.isArray(tools)) fail(`${file}: contributes.tools must be an array`);
+  if (tools.length > 16) fail(`${file}: contributes.tools must hold at most 16 tools`);
+  if (tools.length > 0 && !capabilities.includes('tool.canvas')) {
+    fail(`${file}: contributes.tools requires the "tool.canvas" capability`);
+  }
+  if (tools.length > 0 && raw.apiVersion < 3) {
+    fail(`${file}: contributes.tools requires apiVersion 3`);
+  }
+  const toolIds = new Set();
+  const toolShortcuts = new Set();
+  for (const [index, tool] of tools.entries()) {
+    const where = `${file}: contributes.tools[${index}]`;
+    if (tool === null || typeof tool !== 'object' || Array.isArray(tool)) {
+      fail(`${where} must be an object`);
+    }
+    const id = localId(tool.id, `${where}.id`);
+    if (toolIds.has(id)) fail(`${where}.id "${id}" is duplicated`);
+    toolIds.add(id);
+    text(tool.title, `${where}.title`, 80);
+    optionalText(tool.icon, `${where}.icon`, 8192);
+    if (tool.cursor !== undefined && !TOOL_CURSORS.has(tool.cursor)) {
+      fail(`${where}.cursor must be one of ${[...TOOL_CURSORS].join(', ')}`);
+    }
+    if (
+      tool.order !== undefined &&
+      (typeof tool.order !== 'number' || !Number.isFinite(tool.order))
+    ) {
+      fail(`${where}.order must be a number`);
+    }
+    if (tool.shortcut !== undefined) {
+      if (!isToolShortcut(tool.shortcut)) {
+        fail(`${where}.shortcut must be one lowercase letter or digit`);
+      }
+      if (RESERVED_TOOL_SHORTCUTS.has(tool.shortcut)) {
+        fail(`${where}.shortcut "${tool.shortcut}" is reserved by a built-in tool`);
+      }
+      if (toolShortcuts.has(tool.shortcut)) {
+        fail(`${where}.shortcut "${tool.shortcut}" is duplicated`);
+      }
+      toolShortcuts.add(tool.shortcut);
+    }
+  }
+  return tools;
 }
 
 function readManifest(folder) {
@@ -154,7 +223,9 @@ function readManifest(folder) {
   const file = manifestPath;
   if (raw.version !== 2) fail(`${file}: version must be 2`);
   if (raw.uiVersion !== 1) fail(`${file}: uiVersion must be 1`);
-  if (raw.apiVersion !== 2) fail(`${file}: apiVersion must be 2`);
+  if (raw.apiVersion !== 2 && raw.apiVersion !== 3) {
+    fail(`${file}: apiVersion must be 2 or 3`);
+  }
 
   const id = text(raw.id, `${file}: id`, 64);
   if (!ID.test(id) || id.includes('..') || id.endsWith('.')) fail(`${file}: id is not usable`);
@@ -178,7 +249,7 @@ function readManifest(folder) {
   const main = relativePath(raw.main, `${file}: main`);
   const readme = raw.readme === undefined ? undefined : relativePath(raw.readme, `${file}: readme`);
   const icon = raw.icon === undefined ? undefined : relativePath(raw.icon, `${file}: icon`);
-  validateContributions(raw, capabilities, file);
+  const tools = validateContributions(raw, capabilities, file);
 
   return {
     id,
@@ -193,6 +264,7 @@ function readManifest(folder) {
     readme,
     icon,
     manifestPath,
+    tools,
   };
 }
 
@@ -204,7 +276,7 @@ export function buildIndex({ ref, generatedAt } = {}) {
     .map((entry) => entry.name)
     .sort();
 
-  const plugins = folders.map((folder) => {
+  const built = folders.map((folder) => {
     const manifest = readManifest(folder);
     const mainPath = `plugins/${folder}/${manifest.main}`;
     const readmePath = manifest.readme ? `plugins/${folder}/${manifest.readme}` : undefined;
@@ -213,33 +285,48 @@ export function buildIndex({ ref, generatedAt } = {}) {
     const readme = readmePath ? read(readmePath) : undefined;
     const icon = iconPath ? read(iconPath) : undefined;
     return {
-      id: manifest.id,
-      name: manifest.name,
-      pluginVersion: manifest.pluginVersion,
-      description: manifest.description,
-      author: manifest.author,
-      tags: manifest.tags,
-      apiVersion: manifest.apiVersion,
-      minAppVersion: manifest.minAppVersion,
-      ref: targetRef,
-      manifest: manifest.manifestPath,
-      main: mainPath,
-      readme: readmePath,
-      icon: iconPath,
-      sha256: {
-        manifest: sha256(read(manifest.manifestPath)),
-        main: sha256(main),
-        ...(readme ? { readme: sha256(readme) } : {}),
-        ...(icon ? { icon: sha256(icon) } : {}),
+      tools: manifest.tools,
+      entry: {
+        id: manifest.id,
+        name: manifest.name,
+        pluginVersion: manifest.pluginVersion,
+        description: manifest.description,
+        author: manifest.author,
+        tags: manifest.tags,
+        apiVersion: manifest.apiVersion,
+        minAppVersion: manifest.minAppVersion,
+        ref: targetRef,
+        manifest: manifest.manifestPath,
+        main: mainPath,
+        readme: readmePath,
+        icon: iconPath,
+        sha256: {
+          manifest: sha256(read(manifest.manifestPath)),
+          main: sha256(main),
+          ...(readme ? { readme: sha256(readme) } : {}),
+          ...(icon ? { icon: sha256(icon) } : {}),
+        },
       },
     };
   });
+
+  const shortcuts = new Map();
+  for (const item of built) {
+    for (const tool of item.tools) {
+      if (tool.shortcut === undefined) continue;
+      const owner = shortcuts.get(tool.shortcut);
+      if (owner) {
+        fail(`tool shortcut "${tool.shortcut}" is used by both ${owner} and ${item.entry.id}`);
+      }
+      shortcuts.set(tool.shortcut, item.entry.id);
+    }
+  }
 
   return {
     schema: 1,
     generatedAt: generatedAt ?? new Date().toISOString(),
     ref: targetRef,
-    plugins: plugins.sort((a, b) => a.name.localeCompare(b.name)),
+    plugins: built.map((item) => item.entry).sort((a, b) => a.name.localeCompare(b.name)),
   };
 }
 
