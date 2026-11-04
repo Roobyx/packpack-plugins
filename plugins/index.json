@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-04T07:18:51.111Z",
-  "ref": "b2f486a3c5256dba758645cb94ebd8d753c0edb9",
+  "generatedAt": "2026-11-04T07:21:01.567Z",
+  "ref": "5636ddecd1a8d7928720c64f11bee2b8a694148b",
   "plugins": [
     {
       "id": "packpack.magic-wand",
@@ -16,7 +16,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "b2f486a3c5256dba758645cb94ebd8d753c0edb9",
+      "ref": "5636ddecd1a8d7928720c64f11bee2b8a694148b",
       "manifest": "plugins/packpack.magic-wand/manifest.json",
       "main": "plugins/packpack.magic-wand/main.js",
       "readme": "plugins/packpack.magic-wand/README.md",
@@ -40,7 +40,7 @@
       ],
       "apiVersion": 2,
       "minAppVersion": "0.31.0",
-      "ref": "b2f486a3c5256dba758645cb94ebd8d753c0edb9",
+      "ref": "5636ddecd1a8d7928720c64f11bee2b8a694148b",
       "manifest": "plugins/example.stats/manifest.json",
       "main": "plugins/example.stats/main.js",
       "readme": "plugins/example.stats/README.md",
@@ -64,14 +64,14 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "b2f486a3c5256dba758645cb94ebd8d753c0edb9",
+      "ref": "5636ddecd1a8d7928720c64f11bee2b8a694148b",
       "manifest": "plugins/packpack.ruler/manifest.json",
       "main": "plugins/packpack.ruler/main.js",
       "readme": "plugins/packpack.ruler/README.md",
       "icon": "plugins/packpack.ruler/icon.svg",
       "sha256": {
         "manifest": "deb6cc4143bc6344e81efa38dfd07fef05a5893b2adf73898fcde55da1de6975",
-        "main": "4814839a0258d08597142b8b704ee79b002ec7781cf868886d299abf8b020070",
+        "main": "f9032f95c611b5c1b37e5bc6ffabb5782c4d2f786815b2a73b7bb1826dd3990d",
         "readme": "6ba0f09dd6684873161967943ffe1f7f356a4f890f17dfd85aee67a9e92d8e7f",
         "icon": "8175b90cc2544204f0c51d7173856cef9e08a9a2c256aabc177a43b8407c76c2"
       }
@@ -89,7 +89,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "b2f486a3c5256dba758645cb94ebd8d753c0edb9",
+      "ref": "5636ddecd1a8d7928720c64f11bee2b8a694148b",
       "manifest": "plugins/packpack.tile-replace/manifest.json",
       "main": "plugins/packpack.tile-replace/main.js",
       "readme": "plugins/packpack.tile-replace/README.md",
