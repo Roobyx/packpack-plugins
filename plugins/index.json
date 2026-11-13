@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-13T17:40:22.960Z",
-  "ref": "78b4120",
+  "generatedAt": "2026-11-13T18:22:41.163Z",
+  "ref": "b8aa8b2",
   "plugins": [
     {
       "id": "packpack.magic-wand",
@@ -16,7 +16,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "78b4120",
+      "ref": "b8aa8b2",
       "manifest": "plugins/packpack.magic-wand/manifest.json",
       "main": "plugins/packpack.magic-wand/main.js",
       "readme": "plugins/packpack.magic-wand/README.md",
@@ -40,7 +40,7 @@
       ],
       "apiVersion": 2,
       "minAppVersion": "0.31.0",
-      "ref": "78b4120",
+      "ref": "b8aa8b2",
       "manifest": "plugins/example.stats/manifest.json",
       "main": "plugins/example.stats/main.js",
       "readme": "plugins/example.stats/README.md",
@@ -55,7 +55,7 @@
     {
       "id": "packpack.rivers",
       "name": "Rivers",
-      "pluginVersion": "1.0.0",
+      "pluginVersion": "1.0.1",
       "description": "Draw meandering rivers from a start point to one or more ends, avoiding collision, with optional end caps and bridges.",
       "author": "PackPack",
       "tags": [
@@ -65,13 +65,13 @@
       ],
       "apiVersion": 4,
       "minAppVersion": "0.51.0",
-      "ref": "78b4120",
+      "ref": "b8aa8b2",
       "manifest": "plugins/packpack.rivers/manifest.json",
       "main": "plugins/packpack.rivers/main.js",
       "readme": "plugins/packpack.rivers/README.md",
       "icon": "plugins/packpack.rivers/icon.svg",
       "sha256": {
-        "manifest": "28be4242b30bb43ad7f64f0d6054f01215c3c6df2fc94357cf422b202ec05280",
+        "manifest": "079277187b49750f93b488ac8166b90cb462784fe0ff8d21d0af81320a3a1d85",
         "main": "2021b9ad002b9f680dcaa388381d0e51fc86a75794e9993af09d6c6cca8bb87f",
         "readme": "1a206852c86efdbffb1b17cf5a2626793673707cc89d18b759d12ab8105e58d6",
         "icon": "53f04bcafefcde1b3243f5a007c895c4e6782e22d4b7b1cceba9eceeaa583537"
@@ -89,7 +89,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "78b4120",
+      "ref": "b8aa8b2",
       "manifest": "plugins/packpack.ruler/manifest.json",
       "main": "plugins/packpack.ruler/main.js",
       "readme": "plugins/packpack.ruler/README.md",
@@ -114,7 +114,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "78b4120",
+      "ref": "b8aa8b2",
       "manifest": "plugins/packpack.tile-replace/manifest.json",
       "main": "plugins/packpack.tile-replace/main.js",
       "readme": "plugins/packpack.tile-replace/README.md",
