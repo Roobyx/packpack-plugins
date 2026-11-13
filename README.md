@@ -23,9 +23,10 @@ The folder name must equal the manifest `id`.
 ## Add or update a plugin
 
 1. Create `plugins/<id>/manifest.json` using manifest v2. Declare only the
-   capabilities you need: `map.read`, `map.write`, `ui.sidebar`, `ui.toolbar`,
-   `tool.canvas`. A canvas tool uses `apiVersion` 3 and a `contributes.tools`
-   entry.
+   capabilities you need: `map.read`, `map.read.collision`, `map.write`,
+   `ui.sidebar`, `ui.dialog`, `ui.toolbar`, `tool.canvas`, `compute.pathfind`.
+   A canvas tool uses `apiVersion` 3 or 4 and a `contributes.tools` entry. API 4
+   adds collision masks, host-rendered dialogs and the host path search.
 2. Add `main.js` (runs in a sandboxed iframe with no DOM, storage or network),
    `README.md` and an `icon.svg`.
 3. Commit the plugin files.

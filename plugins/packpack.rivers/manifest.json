@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "uiVersion": 1,
+  "apiVersion": 4,
+  "id": "packpack.rivers",
+  "name": "Rivers",
+  "pluginVersion": "1.0.0",
+  "minAppVersion": "0.51.0",
+  "description": "Draw meandering rivers from a start point to one or more ends, avoiding collision, with optional end caps and bridges.",
+  "author": "PackPack",
+  "license": "MIT",
+  "tags": ["tools", "terrain", "water"],
+  "main": "main.js",
+  "icon": "icon.svg",
+  "readme": "README.md",
+  "capabilities": [
+    "map.read",
+    "map.read.collision",
+    "map.write",
+    "ui.sidebar",
+    "ui.dialog",
+    "tool.canvas",
+    "compute.pathfind"
+  ],
+  "contributes": {
+    "panels": [
+      {
+        "id": "rivers",
+        "title": "Rivers",
+        "location": "right",
+        "order": 140,
+        "body": [
+          {
+            "type": "text",
+            "text": "Activate the Rivers tool in the toolbar to load the options."
+          }
+        ]
+      }
+    ],
+    "tools": [
+      {
+        "id": "rivers",
+        "title": "Rivers",
+        "cursor": "crosshair",
+        "order": 310,
+        "shortcut": "n"
+      }
+    ]
+  }
+}

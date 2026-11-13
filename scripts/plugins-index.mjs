@@ -19,10 +19,13 @@ const indexPath = join(pluginsDir, 'index.json');
 
 const CAPABILITIES = new Set([
   'map.read',
+  'map.read.collision',
   'map.write',
   'ui.sidebar',
+  'ui.dialog',
   'ui.toolbar',
   'tool.canvas',
+  'compute.pathfind',
 ]);
 const ID = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 const LOCAL_ID = /^[A-Za-z0-9_-]{1,64}$/;
@@ -223,8 +226,8 @@ function readManifest(folder) {
   const file = manifestPath;
   if (raw.version !== 2) fail(`${file}: version must be 2`);
   if (raw.uiVersion !== 1) fail(`${file}: uiVersion must be 1`);
-  if (raw.apiVersion !== 2 && raw.apiVersion !== 3) {
-    fail(`${file}: apiVersion must be 2 or 3`);
+  if (raw.apiVersion !== 2 && raw.apiVersion !== 3 && raw.apiVersion !== 4) {
+    fail(`${file}: apiVersion must be 2, 3 or 4`);
   }
 
   const id = text(raw.id, `${file}: id`, 64);
