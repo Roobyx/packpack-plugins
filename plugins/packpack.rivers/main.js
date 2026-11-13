@@ -19,6 +19,7 @@ const state = {
   riverLayerId: null,
   collisionLayerId: null,
   meander: 35,
+  width: 1,
   caps: {
     left: { enabled: false, gid: null },
     right: { enabled: false, gid: null },
@@ -98,6 +99,44 @@ function farEnough(chosen, cell) {
       Math.abs(other.x - cell.x) + Math.abs(other.y - cell.y) > 1 &&
       Math.abs(other.distance - cell.distance) >= 2,
   );
+}
+
+/** The local width of the river at one path cell: base − 1, base or base + 1. */
+function riverWidthAt(index) {
+  const base = Math.max(1, Math.min(32, state.width));
+  const variation = Math.round(valueNoise(index / 7, 19.17) * 2 - 1);
+  return Math.max(1, base + variation);
+}
+
+/** A unit normal to the path at one cell, in 8-way steps. */
+function normalAt(cells, index) {
+  const previous = cells[Math.max(0, index - 1)];
+  const next = cells[Math.min(cells.length - 1, index + 1)];
+  let dx = next.x - previous.x;
+  let dy = next.y - previous.y;
+  if (dx === 0 && dy === 0) return { x: 0, y: 1 };
+  const scale = Math.max(Math.abs(dx), Math.abs(dy));
+  dx /= scale;
+  dy /= scale;
+  return { x: -dy, y: dx };
+}
+
+/** The cells of one river cross-section, centred as closely as an even width allows. */
+function crossSection(center, normal, width) {
+  const start = -Math.floor((width - 1) / 2);
+  const points = [];
+  for (let offset = 0; offset < width; offset++) {
+    const step = start + offset;
+    points.push({
+      x: center.x + Math.round(normal.x * step),
+      y: center.y + Math.round(normal.y * step),
+    });
+  }
+  return points;
+}
+
+function mapContainsPoint(point, summary) {
+  return point.x >= 0 && point.y >= 0 && point.x < summary.width && point.y < summary.height;
 }
 
 // ---- panel ----------------------------------------------------------------
@@ -198,6 +237,14 @@ function buildPanel(summary) {
           min: 0,
           max: 100,
           value: state.meander,
+        },
+        {
+          type: 'number',
+          id: 'riverWidth',
+          label: 'Width (varies ±1)',
+          min: 1,
+          max: 32,
+          value: state.width,
         },
       ],
     },
@@ -414,12 +461,13 @@ async function paintOverlay() {
 // ---- path search ----------------------------------------------------------
 
 function regionFor(start, ends, summary, margin) {
+  const reach = margin + Math.ceil((Math.max(1, state.width) + 1) / 2) + 2;
   const xs = [start.x, ...ends.map((end) => end.x)];
   const ys = [start.y, ...ends.map((end) => end.y)];
-  const minX = Math.max(0, Math.min(...xs) - margin);
-  const maxX = Math.min(summary.width - 1, Math.max(...xs) + margin);
-  const minY = Math.max(0, Math.min(...ys) - margin);
-  const maxY = Math.min(summary.height - 1, Math.max(...ys) + margin);
+  const minX = Math.max(0, Math.min(...xs) - reach);
+  const maxX = Math.min(summary.width - 1, Math.max(...xs) + reach);
+  const minY = Math.max(0, Math.min(...ys) - reach);
+  const maxY = Math.min(summary.height - 1, Math.max(...ys) + reach);
   return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
 }
 
@@ -515,7 +563,7 @@ async function findPaths(summary) {
         })),
       });
     }
-    if (paths.length === ends.length) return { box, paths };
+    if (paths.length === ends.length) return { box, collision, paths };
   }
   throw lastError ?? riverError('no-path', 'No route avoids the collision tiles.');
 }
@@ -619,10 +667,21 @@ function chooseBridges(paths, summary, caps) {
       const straight = isStraight(cells, index);
       const existing = byIndex.get(key);
       if (existing) {
-        existing.distance = Math.min(existing.distance, index);
+        if (index < existing.distance) {
+          existing.distance = index;
+          existing.path = cells;
+          existing.pathIndex = index;
+        }
         existing.straight = existing.straight || straight;
       } else {
-        byIndex.set(key, { ...cell, index: key, distance: index, straight });
+        byIndex.set(key, {
+          ...cell,
+          index: key,
+          distance: index,
+          straight,
+          path: cells,
+          pathIndex: index,
+        });
       }
     }
   }
@@ -637,21 +696,50 @@ function chooseBridges(paths, summary, caps) {
 
 // ---- write ----------------------------------------------------------------
 
-async function applyRiver(paths, caps, bridges, summary) {
+async function applyRiver(found, caps, bridges, summary) {
   const cells = new Map();
-  for (const path of paths) {
-    for (const cell of path.cells) {
-      const index = cellIndex(cell, summary);
-      if (!cells.has(index)) cells.set(index, { x: cell.x, y: cell.y, gid: state.waterGid });
+  const startIndex = state.start ? cellIndex(state.start, summary) : -1;
+  for (const path of found.paths) {
+    for (let index = 0; index < path.cells.length; index++) {
+      const width = riverWidthAt(index);
+      const normal = normalAt(path.cells, index);
+      for (const point of crossSection(path.cells[index], normal, width)) {
+        if (!mapContainsPoint(point, summary)) continue;
+        if (
+          blockedAt(found.collision, {
+            x: point.x - found.box.x,
+            y: point.y - found.box.y,
+          })
+        ) {
+          continue;
+        }
+        const key = cellIndex(point, summary);
+        if (!cells.has(key)) cells.set(key, { x: point.x, y: point.y, gid: state.waterGid });
+      }
     }
   }
   for (const [index, cap] of caps) {
     cells.set(index, { x: cap.x, y: cap.y, gid: cap.gid });
   }
   for (const bridge of bridges) {
-    const index = cellIndex(bridge, summary);
-    const existing = cells.get(index);
-    if (existing) cells.set(index, { ...existing, gid: state.bridge.gid });
+    const width = riverWidthAt(bridge.pathIndex);
+    const normal = normalAt(bridge.path, bridge.pathIndex);
+    const center = bridge.path[bridge.pathIndex];
+    for (const point of crossSection(center, normal, width)) {
+      if (!mapContainsPoint(point, summary)) continue;
+      if (
+        blockedAt(found.collision, {
+          x: point.x - found.box.x,
+          y: point.y - found.box.y,
+        })
+      ) {
+        continue;
+      }
+      const index = cellIndex(point, summary);
+      if (index === startIndex || caps.has(index)) continue;
+      const existing = cells.get(index);
+      if (existing) cells.set(index, { ...existing, gid: state.bridge.gid });
+    }
   }
   const indices = [...cells.keys()];
   const gids = indices.map((index) => cells.get(index).gid);
@@ -659,6 +747,7 @@ async function applyRiver(paths, caps, bridges, summary) {
     throw riverError('empty', 'The river has no cells to paint.');
   }
   await api.map.applyCells(state.riverLayerId, indices, gids, 'Rivers');
+  return indices.length;
 }
 
 // ---- dialogs --------------------------------------------------------------
@@ -800,9 +889,9 @@ async function confirmRiver() {
     state.capPreview = [...caps.values()];
     state.bridgePreview = bridges;
     await paintOverlay();
-    await applyRiver(found.paths, caps, bridges, summary);
+    const written = await applyRiver(found, caps, bridges, summary);
     setStatus(
-      `River created: ${found.paths.length} path${found.paths.length === 1 ? '' : 's'}, ${caps.size} end cap${caps.size === 1 ? '' : 's'}, ${bridges.length} bridge${bridges.length === 1 ? '' : 's'}.`,
+      `River created: ${written} cells at width ${state.width} ±1 · ${found.paths.length} path${found.paths.length === 1 ? '' : 's'} · ${caps.size} end cap${caps.size === 1 ? '' : 's'} · ${bridges.length} bridge${bridges.length === 1 ? '' : 's'}.`,
     );
     state.start = null;
     state.ends = [];
@@ -879,6 +968,9 @@ api.ui.onEvent(PANEL_ID, 'collisionLayer', (value) => {
 });
 api.ui.onEvent(PANEL_ID, 'meander', (value) => {
   state.meander = Math.max(0, Math.min(100, Number(value) || 0));
+});
+api.ui.onEvent(PANEL_ID, 'riverWidth', (value) => {
+  state.width = Math.max(1, Math.min(32, Number(value) || 1));
 });
 for (const side of ['left', 'right']) {
   api.ui.onEvent(PANEL_ID, `${side}CapEnabled`, (value) => {

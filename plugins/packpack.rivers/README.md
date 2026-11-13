@@ -15,13 +15,21 @@ like a ruler line.
    layers or tilesets change.
 3. Click the start cell on the map.
 4. Click one or more end cells. Each click adds another end.
-5. Set **Meander** if you want a straighter or more wandering river.
+5. Set **Width** and **Meander** if you want a wider or more wandering river.
 6. Optionally choose end caps and bridges (below).
 7. Click **Create river**.
 
 The river is written in one undo entry. If no route exists, a dialog offers
 **Cancel** or **Re-select end point**; the failed end is removed and the tool
 stays armed for a new one.
+
+## Width
+
+**Width** is the nominal number of cells across the river. Each cross-section
+varies by one cell: a width of 4 stamps 3, 4 or 5 cells, using a smooth
+deterministic noise along the path. The cross-section is perpendicular to the
+local flow, and cells that carry collision are skipped. A bridge spans the local
+width.
 
 ## End caps
 
@@ -45,7 +53,8 @@ Only left and right caps are exposed in this version.
 ## Bridges
 
 Bridges are optional and replace the water tile on the river layer at the
-chosen cells. A bridge tile that includes water is therefore the simplest
+chosen cells. A bridge spans the local river width, so a width-4 river gets a
+4-cell bridge. A bridge tile that includes water is therefore the simplest
 choice; a transparent overlay tile is not supported yet.
 
 - **Set number** places the requested number of bridges, spread along the
@@ -63,6 +72,7 @@ choice; a transparent overlay tile is not supported yet.
 - The search covers at most 4,000,000 cells. A very long river across a large
   map can exceed that; move the endpoints closer or split the river.
 - One water tile, one end-cap pair and one bridge tile are used per run.
+- Width is capped at 32 cells; the actual cross-section can reach 33.
 - The tile picker renders at most 4096 tiles at once; narrow the **Tileset**
   select if the map has more.
 - Bridges are placed on the river layer, not a separate decoration layer.
