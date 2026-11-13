@@ -8,8 +8,11 @@ like a ruler line.
 ## Use
 
 1. Pick **Rivers** in the map editor toolbar (shortcut `n`).
-2. In the **Rivers** panel, choose the tileset, water tile, river layer and the
-   layer whose collision the river must avoid.
+2. In the **Rivers** panel, choose the water tile, river layer and the layer
+   whose collision the river must avoid. The tile picker defaults to **All
+   tilesets**, so every tile from every group in the Tiles section is available;
+   the **Tileset** select narrows it to one group. The panel refreshes when
+   layers or tilesets change.
 3. Click the start cell on the map.
 4. Click one or more end cells. Each click adds another end.
 5. Set **Meander** if you want a straighter or more wandering river.
@@ -60,6 +63,8 @@ choice; a transparent overlay tile is not supported yet.
 - The search covers at most 4,000,000 cells. A very long river across a large
   map can exceed that; move the endpoints closer or split the river.
 - One water tile, one end-cap pair and one bridge tile are used per run.
+- The tile picker renders at most 4096 tiles at once; narrow the **Tileset**
+  select if the map has more.
 - Bridges are placed on the river layer, not a separate decoration layer.
 - The meander is a deterministic value-noise cost, not terrain elevation.
 

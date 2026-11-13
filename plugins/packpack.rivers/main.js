@@ -13,7 +13,8 @@ const MARGINS = [32, 96, 256];
 
 const state = {
   summary: null,
-  tileset: 0,
+  tileset: 'all',
+  panelSignature: '',
   waterGid: null,
   riverLayerId: null,
   collisionLayerId: null,
@@ -101,6 +102,10 @@ function farEnough(chosen, cell) {
 
 // ---- panel ----------------------------------------------------------------
 
+function tileGridTileset() {
+  return state.tileset === 'all' ? { all: true } : { tileset: state.tileset };
+}
+
 function capNodes(side, label) {
   return [
     {
@@ -112,7 +117,7 @@ function capNodes(side, label) {
     {
       type: 'tileGrid',
       id: `${side}Cap`,
-      tileset: state.tileset,
+      ...tileGridTileset(),
       columns: 8,
       selected: state.caps[side].gid ?? undefined,
     },
@@ -141,15 +146,16 @@ function buildPanel(summary) {
     state.waterGid = summary.selectedTile;
   }
   const tilesets = summary.tilesets || [];
-  if (!tilesets.some((tileset) => tileset.index === state.tileset)) {
-    state.tileset = tilesets[0]?.index ?? 0;
+  if (state.tileset !== 'all' && !tilesets.some((tileset) => tileset.index === state.tileset)) {
+    state.tileset = 'all';
   }
-  const tilesetOptions = tilesets.length
-    ? tilesets.map((tileset) => ({
-        value: String(tileset.index),
-        label: tileset.sourceName || `Tileset ${tileset.index + 1}`,
-      }))
-    : [{ value: '0', label: 'Tileset 1' }];
+  const tilesetOptions = [
+    { value: 'all', label: 'All tilesets' },
+    ...tilesets.map((tileset) => ({
+      value: String(tileset.index),
+      label: tileset.sourceName || `Tileset ${tileset.index + 1}`,
+    })),
+  ];
 
   return [
     {
@@ -167,7 +173,7 @@ function buildPanel(summary) {
         {
           type: 'tileGrid',
           id: 'waterTile',
-          tileset: state.tileset,
+          ...tileGridTileset(),
           columns: 8,
           selected: state.waterGid ?? undefined,
         },
@@ -220,7 +226,7 @@ function buildPanel(summary) {
         {
           type: 'tileGrid',
           id: 'bridgeTile',
-          tileset: state.tileset,
+          ...tileGridTileset(),
           columns: 8,
           selected: state.bridge.gid ?? undefined,
         },
@@ -274,10 +280,53 @@ function buildPanel(summary) {
   ];
 }
 
+function panelSignature(summary) {
+  return JSON.stringify({
+    layers: (summary.layers || []).map((layer) => [layer.id, layer.name, layer.type]),
+    tilesets: (summary.tilesets || []).map((tileset) => [
+      tileset.index,
+      tileset.firstGid,
+      tileset.tileCount,
+      tileset.sourceName || '',
+      tileset.frames || 0,
+    ]),
+  });
+}
+
 async function refreshPanel() {
   const summary = await api.document.summary();
   state.summary = summary;
+  state.panelSignature = panelSignature(summary);
   await api.ui.set(PANEL_ID, buildPanel(summary));
+}
+
+let panelRefreshTimer = null;
+let panelPoll = null;
+
+function startPanelWatch() {
+  if (panelPoll !== null) return;
+  panelPoll = window.setInterval(() => {
+    void syncPanel();
+  }, 1500);
+}
+
+async function syncPanel() {
+  try {
+    const summary = await api.document.summary();
+    const signature = panelSignature(summary);
+    if (signature === state.panelSignature) return;
+    state.summary = summary;
+    state.panelSignature = signature;
+    if (
+      state.tileset !== 'all' &&
+      !(summary.tilesets || []).some((tileset) => tileset.index === state.tileset)
+    ) {
+      state.tileset = 'all';
+    }
+    await api.ui.set(PANEL_ID, buildPanel(summary));
+  } catch (error) {
+    api.log(`rivers: panel sync failed: ${String(error)}`);
+  }
 }
 
 function setStatus(text) {
@@ -797,7 +846,9 @@ api.tools
       state.toolActive = true;
       void api.tools.cursor('crosshair').catch(() => {});
       updateSelectionStatus();
-      void refreshPanel().catch((error) => api.log(`rivers: panel failed: ${String(error)}`));
+      startPanelWatch();
+startPanelWatch();
+void refreshPanel().catch((error) => api.log(`rivers: panel failed: ${String(error)}`));
       void paintOverlay();
     },
     onDeactivate() {
@@ -814,7 +865,7 @@ api.tools
 // ---- panel events ---------------------------------------------------------
 
 api.ui.onEvent(PANEL_ID, 'tileset', (value) => {
-  state.tileset = Number(value) || 0;
+  state.tileset = value === 'all' ? 'all' : Number(value) || 0;
   void refreshPanel().catch((error) => api.log(`rivers: panel failed: ${String(error)}`));
 });
 api.ui.onEvent(PANEL_ID, 'waterTile', (value) => {
@@ -860,6 +911,14 @@ api.ui.onEvent(PANEL_ID, 'clear', () => {
 });
 api.ui.onEvent(PANEL_ID, 'refreshLayers', () => {
   void refreshPanel().catch((error) => api.log(`rivers: refresh failed: ${String(error)}`));
+});
+
+api.events.on('change', () => {
+  if (panelRefreshTimer !== null) return;
+  panelRefreshTimer = window.setTimeout(() => {
+    panelRefreshTimer = null;
+    void syncPanel();
+  }, 400);
 });
 
 void refreshPanel().catch((error) => api.log(`rivers: panel failed: ${String(error)}`));
