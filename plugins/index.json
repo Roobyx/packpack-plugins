@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "generatedAt": "2026-11-13T18:55:38.425Z",
-  "ref": "80f16b7",
+  "generatedAt": "2026-11-13T19:29:07.548Z",
+  "ref": "27fffbd",
   "plugins": [
     {
       "id": "packpack.magic-wand",
@@ -16,7 +16,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "80f16b7",
+      "ref": "27fffbd",
       "manifest": "plugins/packpack.magic-wand/manifest.json",
       "main": "plugins/packpack.magic-wand/main.js",
       "readme": "plugins/packpack.magic-wand/README.md",
@@ -40,7 +40,7 @@
       ],
       "apiVersion": 2,
       "minAppVersion": "0.31.0",
-      "ref": "80f16b7",
+      "ref": "27fffbd",
       "manifest": "plugins/example.stats/manifest.json",
       "main": "plugins/example.stats/main.js",
       "readme": "plugins/example.stats/README.md",
@@ -55,7 +55,7 @@
     {
       "id": "packpack.rivers",
       "name": "Rivers",
-      "pluginVersion": "1.0.2",
+      "pluginVersion": "1.1.0",
       "description": "Draw meandering rivers from a start point to one or more ends, avoiding collision, with optional end caps and bridges.",
       "author": "PackPack",
       "tags": [
@@ -65,15 +65,15 @@
       ],
       "apiVersion": 4,
       "minAppVersion": "0.51.3",
-      "ref": "80f16b7",
+      "ref": "27fffbd",
       "manifest": "plugins/packpack.rivers/manifest.json",
       "main": "plugins/packpack.rivers/main.js",
       "readme": "plugins/packpack.rivers/README.md",
       "icon": "plugins/packpack.rivers/icon.svg",
       "sha256": {
-        "manifest": "1f3f7ee9c0ed177637106eb8e533f247974f96d899da72f810332ad2ee131da6",
-        "main": "6ca1aaacefbefa689b17267562f04e4b96fc42ae8dad056c3b7212147d672fec",
-        "readme": "292347189f6c86ba5a1d8a717309b08f563cfb1051625041d693bf2ef6bf4d13",
+        "manifest": "f52eb5d781f8b5305773ed41fa1ae6ef9e2a3e42b40137da560f60c4a527758a",
+        "main": "5cbffa3180ed04efe03cfae44accdfa2c9668f30b5c52a755a8d9f4e1bac1ec0",
+        "readme": "e2155c0b360a377b4971dd096583748280fa9ebe5ec323a3499889cc83ab34d1",
         "icon": "53f04bcafefcde1b3243f5a007c895c4e6782e22d4b7b1cceba9eceeaa583537"
       }
     },
@@ -89,7 +89,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "80f16b7",
+      "ref": "27fffbd",
       "manifest": "plugins/packpack.ruler/manifest.json",
       "main": "plugins/packpack.ruler/main.js",
       "readme": "plugins/packpack.ruler/README.md",
@@ -114,7 +114,7 @@
       ],
       "apiVersion": 3,
       "minAppVersion": "0.33.0",
-      "ref": "80f16b7",
+      "ref": "27fffbd",
       "manifest": "plugins/packpack.tile-replace/manifest.json",
       "main": "plugins/packpack.tile-replace/main.js",
       "readme": "plugins/packpack.tile-replace/README.md",
